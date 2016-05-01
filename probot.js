@@ -36,15 +36,15 @@ controller.hears(['Ani', 'אני', 'signin'], ['direct_message'], function(bot, 
     controller.storage.users.get(message.user, function(err, user) {
         if (user && user.name) {
             if (signedPlayers.indexOf(user.name) == -1) {
-                bot.reply(message, 'Hello ' + user.name + '! You are now registered');
+                bot.reply(message, 'OK, ' + user.name + '! I signed you up');
                 bot.say({
                     type: "message",
-                    text: user.name + ' has joined the list',
+                    text: user.name + ' wants to play today',
                     channel: "C1431N087"
                 });
                 signedPlayers.push(user.name);
             } else {
-                bot.reply(message, user.name + ', you are already registered!');
+                bot.reply(message, user.name + ', you are already signed for today');
             }
         }
     });
@@ -97,22 +97,26 @@ whois = function(response, convo) {
 controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message', function(bot, message) {
     var maxNameLength = 13;
     var name = message.match[1];
-    name = name.substring(0, maxNameLength);
-    if (str.match(/[a-z]/i)) {
-        controller.storage.users.get(message.user, function(err, user) {
-            if (!user) {
-                user = {
-                    id: message.user,
-                };
-            }
-
-            user.name = name;
+    if(name.length > maxNameLength){
+        name = name.substring(0, maxNameLength);
+        bot.reply(message,"Sorry, your name is too long. I trimmed it to " + name)
+    }
+        
+    controller.storage.users.get(message.user, function(err, user) {
+        if (!user) {
+            user = {
+                id: message.user,
+                name: name
+            };
+            
             controller.storage.users.save(user, function(err, id) {
                 bot.reply(message, 'Hi ' + user.name + '! Happy to meet you.');
-                bot.reply(message, 'Your name was too long, so I trimmed it :-)');
             });
-        });
-    }
+        }else{
+            bot.reply(message, "You already exist " + user.name + ". Don't fuck with me");
+        }
+    });
+
 });
 
 controller.hears('Play', ['ambient'], function(bot, message) {
