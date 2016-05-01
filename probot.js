@@ -98,19 +98,21 @@ controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message', function
     var maxNameLength = 13;
     var name = message.match[1];
     name = name.substring(0, maxNameLength);
-    controller.storage.users.get(message.user, function(err, user) {
-        if (!user) {
-            user = {
-                id: message.user,
-            };
-        }
+    if (str.match(/[a-z]/i)) {
+        controller.storage.users.get(message.user, function(err, user) {
+            if (!user) {
+                user = {
+                    id: message.user,
+                };
+            }
 
-        user.name = name;
-        controller.storage.users.save(user, function(err, id) {
-            bot.reply(message, 'Hi ' + user.name + '! Happy to meet you.');
-            bot.reply(message, 'Your name was too long, so I trimmed it :-)');
+            user.name = name;
+            controller.storage.users.save(user, function(err, id) {
+                bot.reply(message, 'Hi ' + user.name + '! Happy to meet you.');
+                bot.reply(message, 'Your name was too long, so I trimmed it :-)');
+            });
         });
-    });
+    }
 });
 
 controller.hears('Play', ['ambient'], function(bot, message) {
