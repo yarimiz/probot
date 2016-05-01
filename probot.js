@@ -118,7 +118,7 @@ controller.hears('Play', ['ambient'], function (bot, message) {
         bot.startConversation(message, rollAGame);
     }
     else{
-        bot.reply(message, "Sorry, it's not 17:30 yet. No game!");
+        bot.reply(message, "Sorry, it's not 17:30 yet. No game! ");
     }
 });
 
