@@ -1,7 +1,13 @@
 var Botkit = require('botkit');
 var moment = require('moment');
 var schedule = require('node-schedule');
- 
+var http = require('http');
+
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+}).listen(process.env.PORT); 
+
+
 var controller = Botkit.slackbot({
   debug: false,
   log: true,
@@ -11,19 +17,11 @@ var controller = Botkit.slackbot({
 });
 
 var signedPlayers = []
-var rolledGames = []
+var rolledGames = [] 
 
 var clearDataJob = schedule.scheduleJob('0 0 0 1/1 * ? *', function(){
   signedPlayers = []
   rolledGames = []
-});
-
-var postGamesJob = schedule.scheduleJob('0 55 17 ? * SUN-THU *', function(){
-    bot.say({
-        type: "message",
-        text: "play",
-        channel: "C1431N087"
-    })
 });
 
 // connect the bot to a stream of messages
@@ -32,7 +30,7 @@ controller.spawn({
 }).startRTM()
 
 // give the bot something to listen for.
-controller.hears(['Ani','אני','signin'],['direct_message','direct_mention','mention','message_received'],function(bot,message) {
+controller.hears(['Ani','אני','signin'],['direct_message'],function(bot,message) {
 	controller.storage.users.get(message.user, function(err, user) {
         if (user && user.name) {
 			if(signedPlayers.indexOf(user.name) == -1){
@@ -52,7 +50,7 @@ controller.hears(['Ani','אני','signin'],['direct_message','direct_mention','m
     });
 });
 
-controller.hears(['signout'],['direct_message','direct_mention','mention'],function(bot,message) {
+controller.hears(['signout'],['direct_message'],function(bot,message) {
 	controller.storage.users.get(message.user, function(err, user) {
         if (user && user.name) {
             var indexOfPlayer = signedPlayers.indexOf(user.name);
@@ -74,17 +72,22 @@ controller.hears(['signout'],['direct_message','direct_mention','mention'],funct
     });
 });
 
-controller.hears('whois', ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears('whois', ['direct_message', 'direct_mention', 'mention','ambient'], function (bot, message) {
     bot.startConversation(message, whois);
 });
 
-controller.hears('showgames', ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears('showgames', ['direct_message', 'direct_mention', 'mention','ambient'], function (bot, message) {
     bot.startConversation(message, showGames);
 });
 
 showGames = function(response, convo){
-    for(i = 1; i <= rolledGames; i++){
-        convo.say("Game #" + i + ": " + rolledGames[i].toString());
+    if(rolledGames.length > 0){
+        convo.say("Total of " + rolledGames.length + " games:");
+        for(i = 0; i < rolledGames.length; i++){
+            convo.say("Game #" + (i+1) + ": " + rolledGames[i].toString());
+        }
+    }else{
+        convo.say("No games rolled for today yet");
     }
 }
 
@@ -93,7 +96,7 @@ whois = function(response, convo){
     convo.say(signedPlayers.toString())
 }
 
-controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message', function(bot, message) {
     var name = message.match[1];
     controller.storage.users.get(message.user, function(err, user) {
         if (!user) {
@@ -109,15 +112,30 @@ controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_men
     });
 });
 
-controller.hears('Play', ['direct_message', 'direct_mention', 'mention'], function (bot, message) {
+controller.hears('Play', ['ambient'], function (bot, message) {
     var now = new Date;
-    //if(now.getHours() > 17 && now.getMinutes() > 30){
+    if(now.getHours() > 17 && now.getMinutes() > 30){
         bot.startConversation(message, rollAGame);
-    //}
-    //else{
-    //    bot.reply(message, "Sorry, it's not 17:30 yet. No game!");
-    //}
+    }
+    else{
+        bot.reply(message, "Sorry, it's not 17:30 yet. No game!");
+    }
 });
+
+controller.hears('help', ['direct_message', 'direct_mention', 'mention','ambient'], function (bot, message) {
+    var now = new Date;
+        bot.startConversation(message, showHelp);
+});
+
+showHelp = function(response, convo){
+    convo.say("I am Pro-Bot. Here is the commands I support:")
+    convo.say("First of all, I have to know you - write 'call me [yourname]' so I will know your name");
+    convo.say("'Ani'/'אני'/'signup' to sign in for today's game (Works only in private message to the bot)");
+    convo.say("'Signout' to sign out from today's game (Works only in private message to the bot)");
+    convo.say("'whois' to see who is signed in for today");
+    convo.say("'play' to roll games for today (Works only in #misc-soccer-il channel and after 17:30)");
+    convo.say("'showGames' to see the rolled games for today");
+}
 
 rollAGame = function(response, convo) {
     convo.say("Starting to roll games, Enjoy and play safe!");
