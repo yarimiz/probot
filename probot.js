@@ -117,10 +117,10 @@ controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message', function
 
 controller.hears('Play', ['ambient'], function(bot, message) {
     var now = new Date;
-    if (now.getHours() > 17 && now.getMinutes() > 30) {
+    if (now.getHours() >= 18) {
         bot.startConversation(message, rollAGame);
     } else {
-        bot.reply(message, "Sorry, it's not 17:30 yet. No game! ");
+        bot.reply(message, "Sorry, it's not 18:00 yet. No game! " + now);
     }
 });
 
