@@ -50,6 +50,10 @@ controller.hears(['Ani', 'אני', 'signin'], ['direct_message'], function(bot, 
     });
 });
 
+controller.hears(['Ani', 'אני', 'signin'], ['ambient'], function(bot, message) {
+    bot.reply(message,"You can signin only by sending me a private message, loser");
+});
+
 controller.hears(['signout'], ['direct_message'], function(bot, message) {
     controller.storage.users.get(message.user, function(err, user) {
         if (user && user.name) {
