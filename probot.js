@@ -4,13 +4,12 @@ var schedule = require('node-schedule');
 var http = require('http');
 var fs = require('fs');
 
-var opts = {
-    logDirectory:'/logs',
-    fileNamePattern:'roll-<DATE>.log',
-    dateFormat:'YYYY.MM.DD'
-};
-var log = require('simple-node-logger').createSimpleLogger();
-log.info("Logger ready");
+var log4js = require('log4js');
+log4js.loadAppender('file');
+log4js.addAppender(log4js.appenders.file('logs/log.log'), 'fileLog');
+var logger = log4js.getLogger('fileLog');
+
+logger.debug("Kaka");
 
 var tokenKey = "noToken";
 fs.readFile('token.txt', 'utf8', function(err,data){
