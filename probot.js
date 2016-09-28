@@ -1,6 +1,4 @@
 var Botkit = require('botkit');
-var moment = require('moment');
-var schedule = require('node-schedule');
 var http = require('http');
 var fs = require('fs');
 
@@ -37,11 +35,6 @@ var controller = Botkit.slackbot({
 
 var signedPlayers = []
 var rolledGames = []
-
-var clearDataJob = schedule.scheduleJob('0 0 0 1/1 * ? *', function() {
-    signedPlayers = []
-    rolledGames = []
-});
 
 // give the bot something to listen for.
 controller.hears(['Ani', 'אני', 'signin'], ['direct_message'], function(bot, message) {
