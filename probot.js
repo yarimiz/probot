@@ -4,8 +4,19 @@ var schedule = require('node-schedule');
 var http = require('http');
 var fs = require('fs');
 
+var opts = {
+    logDirectory:'/logs',
+    fileNamePattern:'roll-<DATE>.log',
+    dateFormat:'YYYY.MM.DD'
+};
+var log = require('simple-node-logger').createSimpleLogger();
+log.info("Logger ready");
+
 var tokenKey = "noToken";
 fs.readFile('token.txt', 'utf8', function(err,data){
+    if (err) {
+        log.info(err);
+    }
     tokenKey = data;
     controller.spawn({
         token:  tokenKey,
