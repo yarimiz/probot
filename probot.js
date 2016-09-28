@@ -2,6 +2,13 @@ var Botkit = require('botkit');
 var moment = require('moment');
 var schedule = require('node-schedule');
 var http = require('http');
+var fs = require('fs');
+
+var token = "";
+
+fs.readFile('token.txt', 'utf8', function(err,data){
+    token = data;
+});
 
 http.createServer(function(req, res) {
     res.writeHead(200, {
@@ -28,7 +35,7 @@ var clearDataJob = schedule.scheduleJob('0 0 0 1/1 * ? *', function() {
 
 // connect the bot to a stream of messages
 controller.spawn({
-    token: "xoxb-37892585655-vsraLj0sE2B0mODftTT5Z2I1",
+    token:  token,
 }).startRTM()
 
 // give the bot something to listen for.
@@ -128,7 +135,7 @@ controller.hears('Play', ['ambient'], function(bot, message) {
     if (now.getHours() >= 18) {
         bot.startConversation(message, rollAGame);
     } else {
-        bot.reply(message, "Sorry, it's not 18:00 yet. No game! " + now);
+        bot.reply(message, "Sorry, it's not 18:00 yet. No game!");
     }
 });
 
@@ -164,7 +171,9 @@ rollAGame = function(response, convo) {
             }
             rolledGames.push(thisGamePlayers);
 
-            convo.say("Game #" + gameNum + ": " + thisGamePlayers.toString());
+            convo.say("Game #" + gameNum);
+            convo.say("Team A: " + thisGamePlayers[0] + " & " + thisGamePlayers[1]);
+            convo.say("Team B: " + thisGamePlayers[2] + " & " + thisGamePlayers[3]);
         }
     } else {
         convo.say("Sorry, no players today");
