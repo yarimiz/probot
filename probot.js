@@ -4,10 +4,12 @@ var schedule = require('node-schedule');
 var http = require('http');
 var fs = require('fs');
 
-var token = "";
-
+var tokenKey = "noToken";
 fs.readFile('token.txt', 'utf8', function(err,data){
-    token = data;
+    tokenKey = data;
+    controller.spawn({
+        token:  tokenKey,
+    }).startRTM()
 });
 
 http.createServer(function(req, res) {
@@ -16,9 +18,8 @@ http.createServer(function(req, res) {
     });
 }).listen(process.env.PORT);
 
-
 var controller = Botkit.slackbot({
-    debug: false,
+    debug: true,
     log: true,
     json_file_store: "db"
         //include "log: false" to disable logging
@@ -32,11 +33,6 @@ var clearDataJob = schedule.scheduleJob('0 0 0 1/1 * ? *', function() {
     signedPlayers = []
     rolledGames = []
 });
-
-// connect the bot to a stream of messages
-controller.spawn({
-    token:  token,
-}).startRTM()
 
 // give the bot something to listen for.
 controller.hears(['Ani', 'אני', 'signin'], ['direct_message'], function(bot, message) {
