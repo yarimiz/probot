@@ -9,16 +9,15 @@ log4js.loadAppender('file');
 log4js.addAppender(log4js.appenders.file('logs/log.log'), 'fileLog');
 var logger = log4js.getLogger('fileLog');
 
-logger.debug("Kaka");
+logger.debug("Logger initialized");
 
-var tokenKey = "noToken";
 fs.readFile('token.txt', 'utf8', function(err,data){
     if (err) {
-        log.info(err);
+        logger.error("Error loading file" + err)
     }
-    tokenKey = data;
+    logger.debug("Token: " + data);
     controller.spawn({
-        token:  tokenKey,
+        token:  data,
     }).startRTM()
 });
 
@@ -29,7 +28,7 @@ http.createServer(function(req, res) {
 }).listen(process.env.PORT);
 
 var controller = Botkit.slackbot({
-    debug: true,
+    debug: false,
     log: true,
     json_file_store: "db"
         //include "log: false" to disable logging

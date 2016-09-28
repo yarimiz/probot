@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "botkit": "^0.2.2",
+    "log4js": "^0.6.38",
     "simple-node-logger": "^0.93.12"
   }
 }
