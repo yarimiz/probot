@@ -163,7 +163,7 @@ rollAGame = function(response, convo) {
             for (playersNum = 1; playersNum <= 4; playersNum++) {
                 if (signedPlayers.length > 0) {
                     var randIndex = Math.floor(Math.random() * signedPlayers.length);
-                    thisGamePlayers.push(signedPlayers[randIndex]);
+                    thisGamePlayers.push("@" + signedPlayers[randIndex]);
                     signedPlayers.splice(randIndex, 1);
                 }
             }
